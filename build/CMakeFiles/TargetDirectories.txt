@@ -1,0 +1,3 @@
+/home/lethargy/projects/raytracer/build/CMakeFiles/raytracer.dir
+/home/lethargy/projects/raytracer/build/CMakeFiles/edit_cache.dir
+/home/lethargy/projects/raytracer/build/CMakeFiles/rebuild_cache.dir
