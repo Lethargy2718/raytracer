@@ -57,6 +57,8 @@ CMakeFiles/raytracer.dir/main.cpp.o: /home/lethargy/projects/raytracer/main.cpp 
   /usr/include/c++/13/bits/postypes.h \
   /usr/include/c++/13/bits/predefined_ops.h \
   /usr/include/c++/13/bits/ptr_traits.h \
+  /usr/include/c++/13/bits/random.h \
+  /usr/include/c++/13/bits/random.tcc \
   /usr/include/c++/13/bits/range_access.h \
   /usr/include/c++/13/bits/refwrap.h \
   /usr/include/c++/13/bits/requires_hosted.h \
@@ -72,6 +74,7 @@ CMakeFiles/raytracer.dir/main.cpp.o: /home/lethargy/projects/raytracer/main.cpp 
   /usr/include/c++/13/bits/stl_iterator.h \
   /usr/include/c++/13/bits/stl_iterator_base_funcs.h \
   /usr/include/c++/13/bits/stl_iterator_base_types.h \
+  /usr/include/c++/13/bits/stl_numeric.h \
   /usr/include/c++/13/bits/stl_pair.h \
   /usr/include/c++/13/bits/stl_raw_storage_iter.h \
   /usr/include/c++/13/bits/stl_tempbuf.h \
@@ -81,6 +84,7 @@ CMakeFiles/raytracer.dir/main.cpp.o: /home/lethargy/projects/raytracer/main.cpp 
   /usr/include/c++/13/bits/streambuf_iterator.h \
   /usr/include/c++/13/bits/string_view.tcc \
   /usr/include/c++/13/bits/stringfwd.h \
+  /usr/include/c++/13/bits/uniform_int_dist.h \
   /usr/include/c++/13/bits/unique_ptr.h \
   /usr/include/c++/13/bits/uses_allocator.h \
   /usr/include/c++/13/bits/uses_allocator_args.h \
@@ -91,6 +95,7 @@ CMakeFiles/raytracer.dir/main.cpp.o: /home/lethargy/projects/raytracer/main.cpp 
   /usr/include/c++/13/clocale \
   /usr/include/c++/13/cmath \
   /usr/include/c++/13/cstddef \
+  /usr/include/c++/13/cstdint \
   /usr/include/c++/13/cstdio \
   /usr/include/c++/13/cstdlib \
   /usr/include/c++/13/cwchar \
@@ -113,10 +118,13 @@ CMakeFiles/raytracer.dir/main.cpp.o: /home/lethargy/projects/raytracer/main.cpp 
   /usr/include/c++/13/limits \
   /usr/include/c++/13/memory \
   /usr/include/c++/13/new \
+  /usr/include/c++/13/numeric \
   /usr/include/c++/13/ostream \
   /usr/include/c++/13/pstl/execution_defs.h \
   /usr/include/c++/13/pstl/glue_memory_defs.h \
+  /usr/include/c++/13/pstl/glue_numeric_defs.h \
   /usr/include/c++/13/pstl/pstl_config.h \
+  /usr/include/c++/13/random \
   /usr/include/c++/13/stdexcept \
   /usr/include/c++/13/streambuf \
   /usr/include/c++/13/string \
@@ -236,6 +244,7 @@ CMakeFiles/raytracer.dir/main.cpp.o: /home/lethargy/projects/raytracer/main.cpp 
   /usr/include/x86_64-linux-gnu/c++/13/bits/error_constants.h \
   /usr/include/x86_64-linux-gnu/c++/13/bits/gthr-default.h \
   /usr/include/x86_64-linux-gnu/c++/13/bits/gthr.h \
+  /usr/include/x86_64-linux-gnu/c++/13/bits/opt_random.h \
   /usr/include/x86_64-linux-gnu/c++/13/bits/os_defines.h \
   /usr/include/x86_64-linux-gnu/gnu/stubs-64.h \
   /usr/include/x86_64-linux-gnu/gnu/stubs.h \
@@ -252,11 +261,11 @@ CMakeFiles/raytracer.dir/main.cpp.o: /home/lethargy/projects/raytracer/main.cpp 
 
 /usr/lib/gcc/x86_64-linux-gnu/13/include/stdarg.h:
 
-/usr/include/x86_64-linux-gnu/sys/types.h:
-
 /usr/include/x86_64-linux-gnu/sys/cdefs.h:
 
 /usr/include/x86_64-linux-gnu/gnu/stubs-64.h:
+
+/usr/include/x86_64-linux-gnu/c++/13/bits/opt_random.h:
 
 /usr/include/x86_64-linux-gnu/c++/13/bits/gthr-default.h:
 
@@ -269,8 +278,6 @@ CMakeFiles/raytracer.dir/main.cpp.o: /home/lethargy/projects/raytracer/main.cpp 
 /usr/include/x86_64-linux-gnu/bits/typesizes.h:
 
 /usr/include/x86_64-linux-gnu/bits/types/timer_t.h:
-
-/usr/include/x86_64-linux-gnu/bits/types/time_t.h:
 
 /usr/include/x86_64-linux-gnu/bits/types/struct_tm.h:
 
@@ -372,13 +379,39 @@ CMakeFiles/raytracer.dir/main.cpp.o: /home/lethargy/projects/raytracer/main.cpp 
 
 /usr/include/c++/13/tr1/legendre_function.tcc:
 
-/usr/include/x86_64-linux-gnu/bits/types/__fpos_t.h:
+/usr/include/x86_64-linux-gnu/sys/single_threaded.h:
 
-/usr/include/c++/13/bits/refwrap.h:
+/usr/include/c++/13/type_traits:
+
+/usr/include/c++/13/tr1/hypergeometric.tcc:
+
+/usr/include/c++/13/tr1/exp_integral.tcc:
+
+/usr/include/c++/13/tr1/ell_integral.tcc:
+
+/usr/include/features-time64.h:
+
+/usr/include/c++/13/string_view:
+
+/usr/include/x86_64-linux-gnu/bits/thread-shared-types.h:
+
+/usr/include/c++/13/system_error:
+
+/usr/include/c++/13/bits/range_access.h:
 
 /usr/include/c++/13/debug/debug.h:
 
 /usr/include/c++/13/stdexcept:
+
+/usr/include/x86_64-linux-gnu/sys/types.h:
+
+/usr/include/c++/13/bits/random.h:
+
+/usr/include/x86_64-linux-gnu/bits/types/struct___jmp_buf_tag.h:
+
+/usr/include/c++/13/bits/stl_tempbuf.h:
+
+/usr/include/c++/13/bits/stl_vector.h:
 
 /usr/include/c++/13/bits/ostream_insert.h:
 
@@ -412,17 +445,7 @@ CMakeFiles/raytracer.dir/main.cpp.o: /home/lethargy/projects/raytracer/main.cpp 
 
 /home/lethargy/projects/raytracer/camera.h:
 
-/usr/include/x86_64-linux-gnu/sys/single_threaded.h:
-
-/usr/include/c++/13/type_traits:
-
-/usr/include/c++/13/tr1/hypergeometric.tcc:
-
 /usr/include/asm-generic/errno-base.h:
-
-/usr/include/features-time64.h:
-
-/usr/include/c++/13/string_view:
 
 /usr/include/errno.h:
 
@@ -504,15 +527,7 @@ CMakeFiles/raytracer.dir/main.cpp.o: /home/lethargy/projects/raytracer/main.cpp 
 
 /usr/include/alloca.h:
 
-/usr/include/c++/13/bits/locale_facets.tcc:
-
-/usr/include/c++/13/bits/requires_hosted.h:
-
-/usr/include/c++/13/bits/string_view.tcc:
-
 /usr/include/c++/13/backward/binders.h:
-
-/usr/include/c++/13/bits/stringfwd.h:
 
 /usr/include/x86_64-linux-gnu/c++/13/bits/os_defines.h:
 
@@ -534,13 +549,11 @@ CMakeFiles/raytracer.dir/main.cpp.o: /home/lethargy/projects/raytracer/main.cpp 
 
 /usr/include/c++/13/bits/basic_ios.h:
 
+/usr/include/c++/13/tr1/bessel_function.tcc:
+
+/usr/include/c++/13/bits/shared_ptr_base.h:
+
 /home/lethargy/projects/raytracer/interval.h:
-
-/usr/include/x86_64-linux-gnu/bits/thread-shared-types.h:
-
-/usr/include/c++/13/bits/range_access.h:
-
-/usr/include/c++/13/system_error:
 
 /usr/include/x86_64-linux-gnu/bits/pthreadtypes-arch.h:
 
@@ -556,9 +569,23 @@ CMakeFiles/raytracer.dir/main.cpp.o: /home/lethargy/projects/raytracer/main.cpp 
 
 /usr/include/c++/13/bits/specfun.h:
 
+/usr/include/x86_64-linux-gnu/bits/types/__fpos_t.h:
+
+/usr/include/c++/13/bits/refwrap.h:
+
+/usr/include/c++/13/bits/locale_facets.tcc:
+
+/usr/include/c++/13/bits/requires_hosted.h:
+
+/usr/include/c++/13/bits/string_view.tcc:
+
 /usr/include/x86_64-linux-gnu/bits/struct_mutex.h:
 
 /usr/include/c++/13/bits/shared_ptr.h:
+
+/usr/include/c++/13/bits/stringfwd.h:
+
+/usr/include/c++/13/bits/uniform_int_dist.h:
 
 /usr/include/c++/13/bits/shared_ptr_atomic.h:
 
@@ -588,17 +615,19 @@ CMakeFiles/raytracer.dir/main.cpp.o: /home/lethargy/projects/raytracer/main.cpp 
 
 /usr/include/c++/13/bits/stl_iterator_base_types.h:
 
+/usr/include/x86_64-linux-gnu/bits/types/time_t.h:
+
+/usr/include/c++/13/bits/stl_numeric.h:
+
 /usr/include/x86_64-linux-gnu/bits/types/error_t.h:
 
 /usr/include/x86_64-linux-gnu/bits/mathcalls-helper-functions.h:
 
 /usr/include/c++/13/bits/stl_raw_storage_iter.h:
 
-/usr/include/x86_64-linux-gnu/bits/types/struct___jmp_buf_tag.h:
+/usr/include/c++/13/random:
 
-/usr/include/c++/13/bits/stl_tempbuf.h:
-
-/usr/include/c++/13/bits/stl_vector.h:
+/usr/include/c++/13/pstl/glue_numeric_defs.h:
 
 /usr/include/c++/13/bits/stl_uninitialized.h:
 
@@ -642,9 +671,9 @@ CMakeFiles/raytracer.dir/main.cpp.o: /home/lethargy/projects/raytracer/main.cpp 
 
 /usr/include/c++/13/bits/uses_allocator_args.h:
 
-/usr/include/c++/13/bits/stl_function.h:
-
 /usr/include/c++/13/tr1/beta_function.tcc:
+
+/usr/include/c++/13/bits/stl_function.h:
 
 /usr/include/c++/13/bits/utility.h:
 
@@ -682,6 +711,8 @@ CMakeFiles/raytracer.dir/main.cpp.o: /home/lethargy/projects/raytracer/main.cpp 
 
 /usr/include/c++/13/cstdio:
 
+/usr/include/c++/13/cstdint:
+
 /usr/include/c++/13/cstdlib:
 
 /usr/include/c++/13/debug/assertions.h:
@@ -712,6 +743,8 @@ CMakeFiles/raytracer.dir/main.cpp.o: /home/lethargy/projects/raytracer/main.cpp 
 
 /usr/include/x86_64-linux-gnu/bits/struct_rwlock.h:
 
+/usr/include/c++/13/bits/random.tcc:
+
 /usr/include/c++/13/pstl/glue_memory_defs.h:
 
 /usr/include/c++/13/limits:
@@ -719,6 +752,8 @@ CMakeFiles/raytracer.dir/main.cpp.o: /home/lethargy/projects/raytracer/main.cpp 
 /usr/include/c++/13/ext/alloc_traits.h:
 
 /usr/include/c++/13/new:
+
+/usr/include/c++/13/numeric:
 
 /usr/include/x86_64-linux-gnu/c++/13/bits/gthr.h:
 
@@ -729,11 +764,3 @@ CMakeFiles/raytracer.dir/main.cpp.o: /home/lethargy/projects/raytracer/main.cpp 
 /usr/include/x86_64-linux-gnu/bits/wordsize.h:
 
 /usr/include/c++/13/pstl/pstl_config.h:
-
-/usr/include/c++/13/bits/shared_ptr_base.h:
-
-/usr/include/c++/13/tr1/bessel_function.tcc:
-
-/usr/include/c++/13/tr1/exp_integral.tcc:
-
-/usr/include/c++/13/tr1/ell_integral.tcc:
