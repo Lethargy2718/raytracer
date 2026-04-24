@@ -1,7 +1,6 @@
 CMakeFiles/raytracer.dir/main.cpp.o: \
  /home/lethargy/projects/raytracer/main.cpp /usr/include/stdc-predef.h \
- /home/lethargy/projects/raytracer/color.h \
- /home/lethargy/projects/raytracer/vec3.h /usr/include/c++/13/cmath \
+ /home/lethargy/projects/raytracer/rtweekend.h /usr/include/c++/13/cmath \
  /usr/include/c++/13/bits/requires_hosted.h \
  /usr/include/x86_64-linux-gnu/c++/13/bits/c++config.h \
  /usr/include/x86_64-linux-gnu/c++/13/bits/os_defines.h \
@@ -172,5 +171,34 @@ CMakeFiles/raytracer.dir/main.cpp.o: \
  /usr/include/c++/13/bits/locale_facets.tcc \
  /usr/include/c++/13/bits/basic_ios.tcc \
  /usr/include/c++/13/bits/ostream.tcc /usr/include/c++/13/istream \
- /usr/include/c++/13/bits/istream.tcc \
- /home/lethargy/projects/raytracer/ray.h
+ /usr/include/c++/13/bits/istream.tcc /usr/include/c++/13/memory \
+ /usr/include/c++/13/bits/stl_tempbuf.h \
+ /usr/include/c++/13/bits/stl_uninitialized.h \
+ /usr/include/c++/13/bits/stl_raw_storage_iter.h \
+ /usr/include/c++/13/bits/align.h \
+ /usr/lib/gcc/x86_64-linux-gnu/13/include/stdint.h /usr/include/stdint.h \
+ /usr/include/x86_64-linux-gnu/bits/stdint-uintn.h \
+ /usr/include/x86_64-linux-gnu/bits/stdint-least.h \
+ /usr/include/c++/13/bits/unique_ptr.h \
+ /usr/include/c++/13/bits/shared_ptr.h \
+ /usr/include/c++/13/bits/shared_ptr_base.h \
+ /usr/include/c++/13/bits/allocated_ptr.h \
+ /usr/include/c++/13/ext/aligned_buffer.h \
+ /usr/include/c++/13/ext/concurrence.h \
+ /usr/include/c++/13/bits/shared_ptr_atomic.h \
+ /usr/include/c++/13/bits/atomic_base.h \
+ /usr/include/c++/13/bits/atomic_lockfree_defines.h \
+ /usr/include/c++/13/backward/auto_ptr.h \
+ /usr/include/c++/13/pstl/glue_memory_defs.h \
+ /usr/include/c++/13/pstl/execution_defs.h \
+ /home/lethargy/projects/raytracer/color.h \
+ /home/lethargy/projects/raytracer/vec3.h \
+ /home/lethargy/projects/raytracer/interval.h \
+ /home/lethargy/projects/raytracer/ray.h \
+ /home/lethargy/projects/raytracer/camera.h \
+ /home/lethargy/projects/raytracer/hittable.h \
+ /home/lethargy/projects/raytracer/hittable_list.h \
+ /usr/include/c++/13/vector /usr/include/c++/13/bits/stl_vector.h \
+ /usr/include/c++/13/bits/stl_bvector.h \
+ /usr/include/c++/13/bits/vector.tcc \
+ /home/lethargy/projects/raytracer/sphere.h
