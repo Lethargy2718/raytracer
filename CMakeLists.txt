@@ -6,4 +6,5 @@ file(GLOB SOURCES
         "*.cpp"
 )
 
-add_executable(raytracer ${SOURCES})
+add_executable(raytracer ${SOURCES}
+        Timer.hpp)

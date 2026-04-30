@@ -6,6 +6,7 @@
 #include "random.hpp"
 #include "hittable.hpp"
 #include "constants.hpp"
+#include "Timer.hpp"
 
 class camera {
   public:
@@ -15,6 +16,8 @@ class camera {
 
     void render(const hittable& world) {
         initialize();
+
+        const Timer timer;
 
         std::cout << "P3\n" << image_width << ' ' << image_height << "\n255\n";
 
@@ -30,7 +33,8 @@ class camera {
             }
         }
 
-        std::clog << "\rDone.                 \n";
+
+        std::clog << "\rDone.                   \n" << "Took " << timer.elapsed() << " seconds.\n";
     }
 
   private:
