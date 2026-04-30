@@ -1,1 +1,0 @@
-/usr/bin/c++ CMakeFiles/raytracer.dir/main.cpp.o CMakeFiles/raytracer.dir/random.cpp.o -o raytracer 
