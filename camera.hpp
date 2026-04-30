@@ -1,12 +1,16 @@
 #pragma once
 
+#include <atomic>
 #include <iostream>
+#include <vector>
+#include <thread>
+
 #include "color.hpp"
 #include "ray.hpp"
 #include "random.hpp"
 #include "hittable.hpp"
 #include "constants.hpp"
-#include "Timer.hpp"
+#include "timer.hpp"
 
 class camera {
   public:
@@ -17,22 +21,48 @@ class camera {
     void render(const hittable& world) {
         initialize();
 
-        const Timer timer;
+        const timer timer;
+
+        std::vector<color> framebuffer(image_width * image_height);
+        std::atomic<int> rows_done{0};
+
+        unsigned int thread_count = std::thread::hardware_concurrency();
+        if (thread_count == 0) thread_count = 4;
+
+        std::vector<std::thread> threads;
+
+        int rows_per_thread = image_height / thread_count;
+
+        for (int t = 0; t < thread_count; t++) {
+            int start = t * rows_per_thread;
+            int end = (t == thread_count - 1) ? image_height : start + rows_per_thread;
+
+            threads.emplace_back([=, &world, &framebuffer, &rows_done]() {
+                render_rows(start, end, world, framebuffer, rows_done);
+            });
+        }
+
+        std::thread progress([&]() {
+            while (true) {
+                int done = rows_done.load();
+                std::clog << "\rScanlines remaining: " << (image_height - done) << "   " << std::flush;
+                if (done >= image_height) break;
+                std::this_thread::sleep_for(std::chrono::milliseconds(100));
+            }
+        });
+
+        for (auto& t : threads) {
+            t.join();
+        }
+        progress.join();
 
         std::cout << "P3\n" << image_width << ' ' << image_height << "\n255\n";
 
         for (int j = 0; j < image_height; j++) {
-            std::clog << "\rScanlines remaining: " << (image_height - j) << ' ' << std::flush;
             for (int i = 0; i < image_width; i++) {
-              color pixel_color(0,0,0);
-                for (int sample = 0; sample < samples_per_pixel; sample++) {
-                    ray r = get_ray(i, j);
-                    pixel_color += ray_color(r, world);
-                }
-                write_color(std::cout, pixel_color * pixel_samples_scale);
+                write_color(std::cout, framebuffer[j * image_width + i]);
             }
         }
-
 
         std::clog << "\rDone.                   \n" << "Took " << timer.elapsed() << " seconds.\n";
     }
@@ -71,6 +101,25 @@ class camera {
         pixel00_loc = viewport_upper_left + 0.5 * (pixel_delta_u + pixel_delta_v);
     }
 
+    void render_rows(int start_j, int end_j,
+                     const hittable& world,
+                     std::vector<color>& framebuffer,
+                     std::atomic<int>& rows_done) const {
+
+        for (int j = start_j; j < end_j; j++) {
+            for (int i = 0; i < image_width; i++) {
+                color pixel_color(0,0,0);
+
+                for (int s = 0; s < samples_per_pixel; s++) {
+                    ray r = get_ray(i, j);
+                    pixel_color += ray_color(r, world);
+                }
+                framebuffer[j * image_width + i] = pixel_color * pixel_samples_scale;
+            }
+            ++rows_done;
+        }
+    }
+
     ray get_ray(int i, int j) const {
         // Construct a camera ray originating from the origin and directed at randomly sampled
         // point around the pixel location i, j.
@@ -95,7 +144,8 @@ class camera {
         hit_record rec;
 
         if (world.hit(r, interval(0, math::infinity), rec)) {
-            return 0.5 * (rec.normal + color(1,1,1));
+            const vec3 bounce_dir = random_vector_on_hemisphere(rec.normal);
+            return 0.5f * ray_color(ray(rec.p, bounce_dir), world);
         }
 
         const vec3 unit_direction = unit_vector(r.direction());

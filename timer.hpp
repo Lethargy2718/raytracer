@@ -2,11 +2,11 @@
 
 #include <chrono>
 
-class Timer {
+class timer {
 public:
     using clock = std::chrono::high_resolution_clock;
 
-    Timer() : start(clock::now()) {}
+    timer() : start(clock::now()) {}
 
     [[nodiscard]] double elapsed() const {
         auto end = clock::now();

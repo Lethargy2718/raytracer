@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cmath>
+#include "random.hpp"
 
 class vec3 {
   public:
@@ -41,6 +42,14 @@ class vec3 {
 
     double length_squared() const {
         return e[0]*e[0] + e[1]*e[1] + e[2]*e[2];
+    }
+
+    static vec3 random() {
+        return {random_double(), random_double(), random_double()};
+    }
+
+    static vec3 random(double min, double max) {
+        return {random_double(min, max), random_double(min, max), random_double(min, max)};
     }
 };
 
@@ -85,11 +94,29 @@ inline double dot(const vec3& u, const vec3& v) {
 }
 
 inline vec3 cross(const vec3& u, const vec3& v) {
-    return vec3(u.e[1] * v.e[2] - u.e[2] * v.e[1],
+    return {u.e[1] * v.e[2] - u.e[2] * v.e[1],
                 u.e[2] * v.e[0] - u.e[0] * v.e[2],
-                u.e[0] * v.e[1] - u.e[1] * v.e[0]);
+                u.e[0] * v.e[1] - u.e[1] * v.e[0]};
 }
 
 inline vec3 unit_vector(const vec3& v) {
     return v / v.length();
+}
+
+inline vec3 random_unit_vector() {
+    while (true) {
+        vec3 vec = vec3::random(-1,1);
+        auto length_squared = vec.length_squared();
+        if (length_squared > 1e-160 && length_squared <= 1) {
+            return vec / sqrt(length_squared);
+        }
+    }
+}
+
+inline vec3 random_vector_on_hemisphere(const vec3& normal) {
+    vec3 random_vec = random_unit_vector();
+    if (dot(random_vec, normal) >= 0.0f) {
+        return random_vec;
+    }
+    return -random_vec;
 }
