@@ -153,6 +153,30 @@ main.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/raytracer.dir/build.make CMakeFiles/raytracer.dir/main.cpp.s
 .PHONY : main.cpp.s
 
+random.o: random.cpp.o
+.PHONY : random.o
+
+# target to build an object file
+random.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/raytracer.dir/build.make CMakeFiles/raytracer.dir/random.cpp.o
+.PHONY : random.cpp.o
+
+random.i: random.cpp.i
+.PHONY : random.i
+
+# target to preprocess a source file
+random.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/raytracer.dir/build.make CMakeFiles/raytracer.dir/random.cpp.i
+.PHONY : random.cpp.i
+
+random.s: random.cpp.s
+.PHONY : random.s
+
+# target to generate assembly for a file
+random.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/raytracer.dir/build.make CMakeFiles/raytracer.dir/random.cpp.s
+.PHONY : random.cpp.s
+
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -165,6 +189,9 @@ help:
 	@echo "... main.o"
 	@echo "... main.i"
 	@echo "... main.s"
+	@echo "... random.o"
+	@echo "... random.i"
+	@echo "... random.s"
 .PHONY : help
 
 

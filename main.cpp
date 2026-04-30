@@ -1,16 +1,14 @@
-#include "rtweekend.h"
-
-#include "camera.h"
-#include "hittable.h"
-#include "hittable_list.h"
-#include "sphere.h"
+#include "camera.hpp"
+#include "hittable_list.hpp"
+#include "vec3.hpp"
+#include "sphere.hpp"
 
 int main() {
     hittable_list world;
 
-    world.add(make_shared<sphere>(point3(0,0,-1), 0.5));
-    world.add(make_shared<sphere>(point3(-2,0,-2), 0.8));
-    world.add(make_shared<sphere>(point3(0,-100.5,-1), 100));
+    world.add(std::make_shared<sphere>(point3(0,0,-1), 0.5));
+    world.add(std::make_shared<sphere>(point3(-2,0,-2), 0.8));
+    world.add(std::make_shared<sphere>(point3(0,-100.5,-1), 100));
 
     camera cam;
 
