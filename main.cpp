@@ -2,6 +2,7 @@
 #include "hittable_list.hpp"
 #include "vec3.hpp"
 #include "sphere.hpp"
+#include "material.hpp"
 
 int main() {
     hittable_list world;
