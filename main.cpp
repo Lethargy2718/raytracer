@@ -31,10 +31,13 @@ int main() {
     camera cam;
 
     cam.aspect_ratio = 16.0 / 9.0;
-    cam.image_width  = 1250;
-    cam.samples_per_pixel = 1;
+    cam.image_width  = 2560 / 2;
+    cam.samples_per_pixel = 7;
     cam.max_depth = 50;
     cam.vfov = 90;
+
+    cam.lookFrom = point3(0,0.8,0);
+    cam.lookAt = point3(0,0,-1);
 
     cam.render(world);
 }
