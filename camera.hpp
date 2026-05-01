@@ -12,6 +12,7 @@
 #include "constants.hpp"
 #include "material.hpp"
 #include "timer.hpp"
+#include "math_utils.hpp"
 
 class camera {
   public:
@@ -19,6 +20,7 @@ class camera {
     int image_width  = 1000;  // Rendered image width in pixel count
     int samples_per_pixel = 10;   // Count of random samples for each pixel
     int max_depth = 50; // Maximum number of bounces
+    double vfov = 90;
 
     void render(const hittable& world) {
         initialize();
@@ -87,10 +89,8 @@ class camera {
 
         center = point3(0, 0, 0);
 
-        // Determine viewport dimensions.
-        constexpr auto focal_length = 1.0;
-        constexpr auto viewport_height = 2.0;
-        const auto viewport_width = viewport_height * (static_cast<double>(image_width)/image_height);
+        const double viewport_height = 2 * std::tan(math::degrees_to_radians(vfov) / 2);
+        const double viewport_width = viewport_height * (static_cast<double>(image_width)/image_height);
 
         // Calculate the vectors across the horizontal and down the vertical viewport edges.
         const auto viewport_u = vec3(viewport_width, 0, 0);
@@ -101,7 +101,7 @@ class camera {
         pixel_delta_v = viewport_v / image_height;
 
         // Calculate the location of the upper left pixel.
-        const auto viewport_upper_left = center - vec3(0, 0, focal_length) - viewport_u/2 - viewport_v/2;
+        const auto viewport_upper_left = center - vec3(0, 0, 1) - viewport_u/2 - viewport_v/2;
         pixel00_loc = viewport_upper_left + 0.5 * (pixel_delta_u + pixel_delta_v);
     }
 
