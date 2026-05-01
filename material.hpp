@@ -37,3 +37,18 @@ class lambertian : public material {
     color albedo;
     float scatter_probability;
 };
+
+class metal : public material {
+  public:
+    metal(const color& albedo) : albedo(albedo) {}
+
+    bool scatter(const ray& r_in, const hit_record& rec, color& attenuation, ray& scattered) const override {
+        attenuation = albedo;
+        vec3 reflected_vector = reflect(r_in.direction(), rec.normal);
+        scattered = ray(rec.p, reflected_vector);
+        return true;
+    }
+
+  private:
+    color albedo;
+};

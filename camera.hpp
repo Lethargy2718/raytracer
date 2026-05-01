@@ -10,6 +10,7 @@
 #include "random.hpp"
 #include "hittable.hpp"
 #include "constants.hpp"
+#include "material.hpp"
 #include "timer.hpp"
 
 class camera {
@@ -66,6 +67,8 @@ class camera {
         }
 
         std::clog << "\rDone.                   \n" << "Took " << timer.elapsed() << " seconds.\n";
+        // std::clog << "Used " << thread_count << " threads.\n";
+        // std::clog << "Sampled " << samples_per_pixel << " times per pixel.\n";
     }
 
   private:
@@ -146,8 +149,13 @@ class camera {
         hit_record rec;
 
         if (world.hit(r, interval(0.001, math::infinity), rec)) {
-            const vec3 bounce_dir = rec.normal + random_unit_vector();
-            return 0.05f * ray_color(ray(rec.p, rec.p + bounce_dir), depth - 1, world);
+            auto &mat = rec.mat;
+            color attenuation;
+            ray scattered;
+            if (mat->scatter(r, rec, attenuation, scattered)) {
+                return attenuation * ray_color(scattered, depth - 1, world);
+            }
+            return {0,0,0};
         }
 
         const vec3 unit_direction = unit_vector(r.direction());

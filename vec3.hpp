@@ -126,3 +126,7 @@ inline vec3 random_vector_on_hemisphere(const vec3& normal) {
     }
     return -random_vec;
 }
+
+inline vec3 reflect(const vec3& incident, const vec3& normal) {
+    return incident - 2 * dot(incident, normal) * normal;
+}
