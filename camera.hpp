@@ -15,8 +15,9 @@
 class camera {
   public:
     double aspect_ratio = 1.0;  // Ratio of image width over height
-    int    image_width  = 1000;  // Rendered image width in pixel count
-    int    samples_per_pixel = 10;   // Count of random samples for each pixel
+    int image_width  = 1000;  // Rendered image width in pixel count
+    int samples_per_pixel = 10;   // Count of random samples for each pixel
+    int max_depth = 50; // Maximum number of bounces
 
     void render(const hittable& world) {
         initialize();
@@ -112,7 +113,7 @@ class camera {
 
                 for (int s = 0; s < samples_per_pixel; s++) {
                     ray r = get_ray(i, j);
-                    pixel_color += ray_color(r, world);
+                    pixel_color += ray_color(r, max_depth, world);
                 }
                 framebuffer[j * image_width + i] = pixel_color * pixel_samples_scale;
             }
@@ -140,12 +141,13 @@ class camera {
         return vec3(random_double() - 0.5, random_double() - 0.5, 0);
     }
 
-    static color ray_color(const ray& r, const hittable& world) {
+    color ray_color(const ray& r, const int depth, const hittable& world) const {
+        if (depth <= 0) return {0,0,0};
         hit_record rec;
 
-        if (world.hit(r, interval(0, math::infinity), rec)) {
-            const vec3 bounce_dir = random_vector_on_hemisphere(rec.normal);
-            return 0.5f * ray_color(ray(rec.p, bounce_dir), world);
+        if (world.hit(r, interval(0.001, math::infinity), rec)) {
+            const vec3 bounce_dir = rec.normal + random_unit_vector();
+            return 0.05f * ray_color(ray(rec.p, rec.p + bounce_dir), depth - 1, world);
         }
 
         const vec3 unit_direction = unit_vector(r.direction());
