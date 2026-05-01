@@ -130,3 +130,9 @@ inline vec3 random_vector_on_hemisphere(const vec3& normal) {
 inline vec3 reflect(const vec3& incident, const vec3& normal) {
     return incident - 2 * dot(incident, normal) * normal;
 }
+
+inline vec3 refract(const vec3& incident, const vec3& normal, const double etai_over_etat) {
+    vec3 refracted_normal = etai_over_etat * (incident - dot(incident, normal) * normal);
+    vec3 refracted_parallel = -std::sqrt(1 - refracted_normal.length_squared()) * normal;
+    return refracted_normal + refracted_parallel;
+}
