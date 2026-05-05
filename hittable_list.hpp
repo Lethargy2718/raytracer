@@ -8,14 +8,18 @@ class hittable_list : public hittable {
   public:
     std::vector<std::shared_ptr<hittable>> objects;
 
-    hittable_list() {}
-    hittable_list(std::shared_ptr<hittable> object) { add(object); }
+    hittable_list() = default;
+
+    hittable_list(const std::shared_ptr<hittable>& object) { add(object); }
 
     void clear() { objects.clear(); }
 
-    void add(std::shared_ptr<hittable> object) {
+    void add(const std::shared_ptr<hittable>& object) {
         objects.push_back(object);
+        bbox = aabb(bbox, object->bounding_box());
     }
+
+    aabb bounding_box() const override { return bbox; }
 
     // Hits the closest object
     bool hit(const ray& r, interval ray_t, hit_record& rec) const override {
@@ -33,4 +37,7 @@ class hittable_list : public hittable {
 
         return hit_anything;
     }
+
+  private:
+    aabb bbox;
 };

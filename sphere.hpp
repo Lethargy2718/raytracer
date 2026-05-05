@@ -6,10 +6,21 @@
 
 class sphere : public hittable {
   public:
-    sphere(const point3& center, const double radius, std::shared_ptr<material> mat) : center(center, vec3(0,0,0)), radius(std::fmax(0,radius)), mat(mat) {}
-    sphere(const point3& center1, const point3& center2, const double radius, std::shared_ptr<material> mat) : center(center1, center2 - center1), radius(std::fmax(0,radius)), mat(mat) {}
+    // Static
+    sphere(const point3& center, const double radius, std::shared_ptr<material> mat) : center(center, vec3(0,0,0)), radius(std::fmax(0,radius)), mat(std::move(mat)) {
+        const auto rvec = vec3(radius, radius, radius);
+        bbox = {center - rvec, center + rvec};
+    }
 
-    bool hit(const ray& r, interval ray_t, hit_record& rec) const override {
+    // Moving
+    sphere(const point3& center1, const point3& center2, const double radius, std::shared_ptr<material> mat) : center(center1, center2 - center1), radius(std::fmax(0,radius)), mat(std::move(mat)) {
+        auto rvec = vec3(radius, radius, radius);
+        aabb box1(center.at(0) - rvec, center.at(0) + rvec);
+        aabb box2(center.at(1) - rvec, center.at(1) + rvec);
+        bbox = aabb(box1, box2);
+    }
+
+    bool hit(const ray& r, const interval ray_t, hit_record& rec) const override {
         vec3 oc = center.at(r.time()) - r.origin();
         auto a = r.direction().length_squared();
         auto h = dot(r.direction(), oc);
@@ -38,8 +49,11 @@ class sphere : public hittable {
         return true;
     }
 
+    aabb bounding_box() const override { return bbox; }
+
   private:
     ray center;
     double radius;
     std::shared_ptr<material> mat;
+    aabb bbox;
 };
