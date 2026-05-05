@@ -31,27 +31,38 @@ class aabb {
     }
 
     bool hit(const ray& r, interval t_interval) const {
-        const point3 &origin = r.origin();
-        const vec3 &dir = r.direction();
+      const point3 &origin = r.origin();
+      const vec3 &dir = r.direction();
 
-        for (int axis{}; axis < 3; axis++) {
-            const interval ax_interval = axis_interval(axis);
+      for (int axis{}; axis < 3; axis++) {
+        const interval ax_interval = axis_interval(axis);
 
-            const auto dir_inv = 1.0 / dir[axis]; // To prevent nan errors
+        const auto dir_inv = 1.0 / dir[axis]; // To prevent nan errors
 
-            auto t0 = (ax_interval.min - origin[axis]) * dir_inv;
-            auto t1 = (ax_interval.max - origin[axis]) * dir_inv;
+        auto t0 = (ax_interval.min - origin[axis]) * dir_inv;
+        auto t1 = (ax_interval.max - origin[axis]) * dir_inv;
 
-            // Ensure t0 < t1
-            if (t0 > t1) std::swap(t0, t1);
+        // Ensure t0 < t1
+        if (t0 > t1) std::swap(t0, t1);
 
-            double mn = std::max(t_interval.min, t0);
-            double mx = std::min(t_interval.max, t1);
+        double mn = std::max(t_interval.min, t0);
+        double mx = std::min(t_interval.max, t1);
 
-            if (mn > mx)
-                return false;
-        }
+        if (mn > mx)
+          return false;
+      }
 
       return true;
     }
+
+    int longest_axis() const {
+        if (x.size() > y.size())
+          return x.size() > z.size() ? 0 : 2;
+        return y.size() > z.size() ? 1 : 2;
+    }
+
+    static const aabb empty, universe;
 };
+
+const aabb aabb::empty    = aabb(interval::empty,    interval::empty,    interval::empty);
+const aabb aabb::universe = aabb(interval::universe, interval::universe, interval::universe);

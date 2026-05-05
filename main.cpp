@@ -3,6 +3,7 @@
 #include "vec3.hpp"
 #include "sphere.hpp"
 #include "material.hpp"
+#include "bvh.hpp"
 
 int main() {
     hittable_list world;
@@ -27,6 +28,7 @@ int main() {
     // ground
     world.add(std::make_shared<sphere>(point3(0,-100.5,-1), 100, gray_metal));
 
+    world = hittable_list(std::make_shared<bvh_node>(world));
     camera cam;
 
     cam.aspect_ratio = 16.0 / 9.0;
