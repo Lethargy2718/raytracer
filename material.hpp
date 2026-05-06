@@ -2,6 +2,7 @@
 
 #include "ray.hpp"
 #include "color.hpp"
+#include "texture.hpp"
 
 class hit_record;
 
@@ -16,24 +17,24 @@ class material {
 
 class lambertian : public material {
   public:
-    lambertian(const color &albedo, const float scatter_probability = 1.0f) : albedo(albedo), scatter_probability(scatter_probability) {}
+    lambertian(const color &albedo, const float scatter_probability = 1.0f) : lambertian(std::make_shared<solid_color>(albedo), scatter_probability) {}
+    lambertian(std::shared_ptr<texture> tex, const float scatter_probability = 1.0f) : tex(std::move(tex)), scatter_probability(scatter_probability) {}
 
     bool scatter(const ray& r_in, const hit_record& rec, color& attenuation, ray& scattered) const override {
         if (random_double(0,1) < scatter_probability) {
-            attenuation = albedo / scatter_probability; // expected/average value
-
             vec3 scatter_dir = rec.normal + random_unit_vector();
             if (scatter_dir.near_zero())
                 scatter_dir = rec.normal;
 
             scattered = ray(rec.p, scatter_dir, r_in.time());
+            attenuation = tex->value(rec.u, rec.v, rec.p) / scatter_probability; // expected/average value
             return true;
         }
         return false;
     }
 
   private:
-    color albedo;
+    std::shared_ptr<texture> tex;
     float scatter_probability;
 };
 

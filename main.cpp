@@ -16,6 +16,10 @@ int main() {
     auto air_bubble_in_water_mat = std::make_shared<dielectric>(1/1.33);
     auto gray_lambertian = std::make_shared<lambertian>(color{0.2,0.2,0.2});
 
+    auto checker_tex1 = std::make_shared<checker_texture>(0.3, std::make_shared<solid_color>(0,0,0), std::make_shared<solid_color>(1,1,1));
+    auto checker_tex2 = std::make_shared<checker_texture>(0.1, std::make_shared<solid_color>(1,0,0), std::make_shared<solid_color>(0.2,0.5,0.3));
+    auto checker_mat1 = std::make_shared<lambertian>(checker_tex1);
+    auto checker_mat2 = std::make_shared<lambertian>(checker_tex2);
     // left
     world.add(std::make_shared<sphere>(point3(-1.76,0.4,-1), 0.8, red_metal));
 
@@ -26,7 +30,7 @@ int main() {
     world.add(std::make_shared<sphere>(point3(1.76,0.4,-1), 0.8, air_bubble_in_water_mat));
 
     // ground
-    world.add(std::make_shared<sphere>(point3(0,-100.5,-1), 100, gray_metal));
+    world.add(std::make_shared<sphere>(point3(0,-100.5,-1), 100, checker_mat1));
 
     world = hittable_list(std::make_shared<bvh_node>(world));
     camera cam;
