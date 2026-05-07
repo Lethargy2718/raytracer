@@ -3,6 +3,7 @@
 #include <memory>
 
 #include "hittable.hpp"
+#include "constants.hpp"
 
 class sphere : public hittable {
   public:
@@ -44,6 +45,7 @@ class sphere : public hittable {
         rec.p = r.at(rec.t);
         vec3 outward_normal = (rec.p - center.at(r.time())) / radius;
         rec.set_face_normal(r, outward_normal);
+        get_sphere_uv(outward_normal, rec.u, rec.v);
         rec.mat = mat;
 
         return true;
@@ -56,4 +58,18 @@ class sphere : public hittable {
     double radius;
     std::shared_ptr<material> mat;
     aabb bbox;
+
+    static void get_sphere_uv(const point3& p, double& u, double& v) {
+        // p: a given point on the unit sphere, centered at the origin.
+        // the same thing as the unit direction from the center to the point.
+        // u: returned value [0,1] of angle around the Y axis from X=-1.
+        // v: returned value [0,1] of angle from Y=-1 to Y=+1.
+
+        auto theta = std::acos(-p.y());
+        auto phi = std::atan2(-p.z(), p.x());
+        if (phi < 0) phi += 2 * math::pi; // Handle flip/discontinuity
+
+        u = phi / (2 * math::pi);
+        v = theta / math::pi;
+    }
 };

@@ -27,23 +27,40 @@ private:
     color albedo;
 };
 
-class checker_texture : public texture {
+class checker_texture_spatial : public texture {
 public:
-    checker_texture(double scale, std::shared_ptr<texture> even, std::shared_ptr<texture> odd)
+    checker_texture_spatial(double scale, std::shared_ptr<texture> even, std::shared_ptr<texture> odd)
       : inv_scale(1.0 / scale), even(std::move(even)), odd(std::move(odd)) {}
 
-    checker_texture(double scale, const color& c1, const color& c2)
-      : checker_texture(scale, std::make_shared<solid_color>(c1), std::make_shared<solid_color>(c2)) {}
+    checker_texture_spatial(double scale, const color& c1, const color& c2)
+      : checker_texture_spatial(scale, std::make_shared<solid_color>(c1), std::make_shared<solid_color>(c2)) {}
 
     color value(double u, double v, const point3& p) const override {
-        // Dividing by scale means more numbers get floored to the same color
-        // so squares become bigger
-        int xInteger = static_cast<int>(std::floor(inv_scale * p.x()));
-        int yInteger = static_cast<int>(std::floor(inv_scale * p.y()));
-        int zInteger = static_cast<int>(std::floor(inv_scale * p.z()));
+        int x = static_cast<int>(std::floor(inv_scale * p.x()));
+        int y = static_cast<int>(std::floor(inv_scale * p.y()));
+        int z = static_cast<int>(std::floor(inv_scale * p.z()));
+        bool isEven = (x + y + z) % 2 == 0;
+        return isEven ? even->value(u, v, p) : odd->value(u, v, p);
+    }
 
-        bool isEven = (xInteger + yInteger + zInteger) % 2 == 0;
+private:
+    double inv_scale;
+    std::shared_ptr<texture> even;
+    std::shared_ptr<texture> odd;
+};
 
+class checker_texture_uv : public texture {
+public:
+    checker_texture_uv(double scale, std::shared_ptr<texture> even, std::shared_ptr<texture> odd)
+      : inv_scale(1.0 / scale), even(std::move(even)), odd(std::move(odd)) {}
+
+    checker_texture_uv(double scale, const color& c1, const color& c2)
+      : checker_texture_uv(scale, std::make_shared<solid_color>(c1), std::make_shared<solid_color>(c2)) {}
+
+    color value(double u, double v, const point3& p) const override {
+        int ui = static_cast<int>(std::floor(inv_scale * u));
+        int vi = static_cast<int>(std::floor(inv_scale * v));
+        bool isEven = (ui + vi) % 2 == 0;
         return isEven ? even->value(u, v, p) : odd->value(u, v, p);
     }
 
