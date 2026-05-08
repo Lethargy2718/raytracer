@@ -5,12 +5,14 @@
 #include "ray.hpp"
 
 class aabb {
-  public:
+public:
     interval x, y, z;
 
     aabb() = default;
 
-    aabb(interval x, interval y, interval z) : x(x), y(y), z(z) {}
+    aabb(interval x, interval y, interval z) : x(x), y(y), z(z) {
+        pad_to_minimums();
+    }
 
     aabb(const point3& p1, const point3& p2) :
         x(interval(std::min(p1[0], p2[0]), std::max(p1[0], p2[0]))),
@@ -62,6 +64,15 @@ class aabb {
     }
 
     static const aabb empty, universe;
+
+private:
+    static constexpr double delta = 0.0001;
+
+    void pad_to_minimums() {
+        if (x.size() < delta) x = x.expand(delta);
+        if (y.size() < delta) y = y.expand(delta);
+        if (z.size() < delta) z = z.expand(delta);
+    }
 };
 
 const aabb aabb::empty    = aabb(interval::empty,    interval::empty,    interval::empty);
