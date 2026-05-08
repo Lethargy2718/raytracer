@@ -6,6 +6,7 @@
 #include "color.hpp"
 #include "vec3.hpp"
 #include "rtw_stb_image.hpp"
+#include "perlin.hpp"
 
 class texture {
 public:
@@ -98,4 +99,54 @@ public:
 
 private:
     rtw_image image;
+};
+
+class perlin_texture : public texture {
+public:
+    explicit perlin_texture(const double scale = 4.0) : scale(scale) {}
+
+    color value(double u, double v, const point3& p) const override {
+        return color(1, 1, 1) * (1 + noise.noise(scale * p));
+    }
+
+private:
+    perlin noise;
+    double scale;
+};
+
+class camo_texture : public texture {
+public:
+    explicit camo_texture(const double scale = 4.0, const int depth = 7) : scale(scale), depth(depth) {}
+
+    color value(double u, double v, const point3& p) const override {
+        return color(1, 1, 1) * noise.turb(p, depth);
+    }
+
+private:
+    perlin noise;
+    double scale;
+    int depth;
+};
+
+class marble_texture : public texture {
+public:
+    explicit marble_texture(
+        double scale = 4.0,
+        double warp_strength = 10.0,
+        int octaves = 7,
+        const vec3 &stripe_axis = vec3(0,0,1)
+    ) : scale(scale), warp_strength(warp_strength), octaves(octaves), stripe_axis(unit_vector(stripe_axis)) {}
+
+    color value(double u, double v, const point3& p) const override {
+        double t = dot(p, stripe_axis);
+        double val = std::sin(scale * t + warp_strength * noise.turb(p, octaves));
+        return color(0.5, 0.5, 0.5) * (1 + val);
+    }
+
+private:
+    perlin noise;
+    double scale;           // Stripe frequency
+    double warp_strength;   // How wavy (10 is typical)
+    int octaves;            // Turbulence detail
+    vec3 stripe_axis;       // Which direction to stripe along
 };
