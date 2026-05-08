@@ -79,3 +79,36 @@ private:
         return true;
     }
 };
+
+class annulus : public quad {
+public:
+    annulus(const point3& Q, const vec3& u, const vec3& v, std::shared_ptr<material> mat,
+            double r_inner)
+        : quad(Q, u, v, std::move(mat)), r_inner(r_inner), r_outer(u.length())
+    {
+        if (std::fabs(dot(unit_vector(u), unit_vector(v))) > 1e-4)
+            std::cerr << "Warning: u and v are not perpendicular for annulus\n";
+        if (std::fabs(u.length() - v.length()) > 1e-4)
+            std::cerr << "Warning: u and v have different lengths for annulus\n";
+        if (r_inner > r_outer)
+            std::cerr << "Warning: r_inner > r_outer for annulus\n";
+    }
+
+    bool in_quad(double a, double b, hit_record& rec) const override {
+        // Map from [0,1] to [-1,-1]
+        a = a*2 - 1;
+        b = b*2 - 1;
+
+        auto lhs = a*a + b*b;
+        if (lhs < r_inner*r_inner || lhs > r_outer*r_outer)
+            return false;
+
+        rec.u = a;
+        rec.v = b;
+        return true;
+    }
+
+private:
+    double r_inner;
+    double r_outer;
+};

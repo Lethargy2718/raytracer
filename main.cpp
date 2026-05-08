@@ -156,16 +156,17 @@ void quads() {
 
     // Quads
     world.add(make_shared<quad>(point3(-3,-2, 5), vec3(0, 0,-4), vec3(0, 4, 0), left_red));
-    world.add(make_shared<quad>(point3(-2,-2, 0), vec3(4, 0, 0), vec3(0, 4, 0), back_green));
     world.add(make_shared<quad>(point3( 3,-2, 1), vec3(0, 0, 4), vec3(0, 4, 0), right_blue));
     world.add(make_shared<quad>(point3(-2, 3, 1), vec3(4, 0, 0), vec3(0, 0, 4), upper_orange));
     world.add(make_shared<quad>(point3(-2,-3, 5), vec3(4, 0, 0), vec3(0, 0,-4), lower_teal));
+
+    world.add(make_shared<annulus>(point3(-1, -1, 1), vec3(2, 0, 0), vec3(0, 2, 0), back_green, 1.75));
 
     camera cam;
 
     cam.aspect_ratio      = 1.0;
     cam.image_width       = 2560 / 2;
-    cam.samples_per_pixel = 100;
+    cam.samples_per_pixel = 10;
     cam.max_depth         = 50;
 
     cam.vfov        = 80;
