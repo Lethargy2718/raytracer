@@ -20,11 +20,15 @@ void default_scene() {
     auto air_bubble_in_glass_mat = make_shared<dielectric>(1/1.5);
     auto air_bubble_in_water_mat = make_shared<dielectric>(1/1.33);
     auto gray_lambertian = make_shared<lambertian>(color{0.2,0.2,0.2});
+    auto marble_tex = make_shared<marble_texture>(6.0, 12.0, 7);
 
     auto checker_tex_uv = make_shared<checker_texture_uv>(0.1, color(1,0,0), color(.2,.5,.6));
     auto checker_tex_spatial = make_shared<checker_texture_spatial>(0.3, color(0,0,0), color(1,1,1));
     auto checker_mat_uv = make_shared<lambertian>(checker_tex_uv);
     auto checker_mat_spatial = make_shared<lambertian>(checker_tex_spatial);
+    auto wall_mat = make_shared<metal>(color(0.8, 0.7, 0.7), 0.0f);
+    auto camo = make_shared<lambertian>(make_shared<camo_texture>(8.0, 7));
+    auto marble_mat = make_shared<lambertian>(marble_tex);
 
     auto earth_texture = make_shared<image_texture>("earthmap.jpg");
     const auto earth_surface = make_shared<lambertian>(earth_texture);
@@ -39,7 +43,20 @@ void default_scene() {
     world.add(make_shared<sphere>(point3(1.76,0.4,-1), 0.8, air_bubble_in_water_mat));
 
     // ground
-    world.add(make_shared<sphere>(point3(0,-1000.5,-1), 1000, checker_mat_spatial));
+    world.add(make_shared<sphere>(point3(0,-1000.5,-1), 1000, camo));
+
+    // triangle
+    auto tri_base = 1.25;
+    world.add(make_shared<triangle>(point3(-tri_base/2, 0, -1.5), vec3(tri_base, 0, 0), vec3(tri_base/2, tri_base, 0), blue_metal));
+
+    // wall
+    double wall_size = 7;
+    world.add(make_shared<quad>(point3(-wall_size, 0, -4), vec3(wall_size * 2, 0, 0), vec3(0, wall_size/3, 0), wall_mat));
+
+    // ring
+    auto ring_size = 1.8;
+    world.add(make_shared<annulus>(point3(-ring_size/2, 1.5, -1), vec3(ring_size, 0, 0), vec3(0, 0, ring_size), checker_mat_spatial, ring_size * 8.0/10));
+
 
     world = hittable_list(make_shared<bvh_node>(world));
     camera cam;
@@ -50,8 +67,8 @@ void default_scene() {
     cam.max_depth = 50;
     cam.vfov = 90;
 
-    cam.look_from = point3(0,0.5,1);
-    cam.look_at = point3(0,0,-1);
+    cam.look_from = point3(0,0.8,1.125);
+    cam.look_at = point3(0,0.8,-1);
 
     cam.render(world);
 }
@@ -151,18 +168,22 @@ void quads() {
     auto left_red     = make_shared<lambertian>(color(1.0, 0.2, 0.2));
     auto back_green   = make_shared<lambertian>(color(0.2, 1.0, 0.2));
     auto right_blue   = make_shared<lambertian>(color(0.2, 0.2, 1.0));
-    auto upper_orange = make_shared<lambertian>(color(1.0, 0.5, 0.0));
+    auto upper_orange = make_shared<metal>(color(1.0, 0.5, 0.0));
     auto lower_teal   = make_shared<lambertian>(color(0.2, 0.8, 0.8));
 
     // Quads
     world.add(make_shared<quad>(point3(-3,-2, 5), vec3(0, 0,-4), vec3(0, 4, 0), left_red));
     world.add(make_shared<quad>(point3( 3,-2, 1), vec3(0, 0, 4), vec3(0, 4, 0), right_blue));
-    world.add(make_shared<quad>(point3(-2, 3, 1), vec3(4, 0, 0), vec3(0, 0, 4), upper_orange));
     world.add(make_shared<quad>(point3(-2,-3, 5), vec3(4, 0, 0), vec3(0, 0,-4), lower_teal));
 
+    // Middle ring
     world.add(make_shared<annulus>(point3(-1, -1, 1), vec3(2, 0, 0), vec3(0, 2, 0), back_green, 1.75));
 
-    world.add(make_shared<triangle>(point3(-0.5, -0.5, 1), vec3(1, 0, 0), vec3(0.5, 1, 0), back_green));
+    // Middle triangle
+    world.add(make_shared<triangle>(point3(-0.5, -0.4, 1), vec3(1, 0, 0), vec3(0.5, 1, 0), back_green));
+
+    // Upper ellipse
+    world.add(make_shared<ellipse>(point3(-2, 3, 1), vec3(4, 0, 0), vec3(0, 0, 4), upper_orange));
 
     camera cam;
 
@@ -182,7 +203,7 @@ void quads() {
 }
 
 int main() {
-    switch (5) {
+    switch (1) {
         case 1:
             default_scene();
             break;
