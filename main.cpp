@@ -162,6 +162,8 @@ void quads() {
 
     world.add(make_shared<annulus>(point3(-1, -1, 1), vec3(2, 0, 0), vec3(0, 2, 0), back_green, 1.75));
 
+    world.add(make_shared<triangle>(point3(-0.5, -0.5, 1), vec3(1, 0, 0), vec3(0.5, 1, 0), back_green));
+
     camera cam;
 
     cam.aspect_ratio      = 1.0;

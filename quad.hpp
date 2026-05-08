@@ -112,3 +112,17 @@ private:
     double r_inner;
     double r_outer;
 };
+
+class triangle : public quad {
+public:
+    triangle(const point3& Q, const vec3& u, const vec3& v, std::shared_ptr<material> mat) : quad(Q, u, v, std::move(mat)) {}
+
+    bool in_quad(double a, double b, hit_record& rec) const override {
+        if (a < 0 || b < 0 || a + b > 1)
+            return false;
+
+        rec.u = a;
+        rec.v = b;
+        return true;
+    }
+};
