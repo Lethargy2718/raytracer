@@ -7,6 +7,7 @@
 #include "quad.hpp"
 #include "material.hpp"
 #include "bvh.hpp"
+#include "obj_loader.hpp"
 
 using std::make_shared;
 
@@ -202,8 +203,36 @@ void quads() {
     cam.render(world);
 }
 
+void obj_scene() {
+    hittable_list world;
+
+    auto model_mat = make_shared<metal>(color(0.8,0.8,0.8));
+
+    auto triangles = load_obj("bunny.obj", model_mat);
+
+    for (auto& tri : triangles) {
+        world.add(tri);
+    }
+
+    world = hittable_list(make_shared<bvh_node>(world));
+
+    camera cam;
+    cam.aspect_ratio      = 16.0 / 9.0;
+    cam.image_width       = 1000;
+    cam.samples_per_pixel = 1;
+    cam.max_depth         = 50;
+
+    cam.vfov        = 30;
+    cam.look_from = point3(0, 0.15, 0.5);
+    cam.look_at   = point3(0, 0.12, 0);
+    cam.vup         = vec3(0, 1, 0);
+    cam.defocus_angle = 0;
+
+    cam.render(world);
+}
+
 int main() {
-    switch (1) {
+    switch (6) {
         case 1:
             default_scene();
             break;
@@ -218,6 +247,9 @@ int main() {
             break;
         case 5:
             quads();
+            break;
+        case 6:
+            obj_scene();
             break;
         default:
             default_scene();

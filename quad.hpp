@@ -57,9 +57,11 @@ public:
         return true;
     }
 
-private:
+protected:
     point3 Q;
     vec3 u, v;
+
+private:
     vec3 w;
     std::shared_ptr<material> mat;
     aabb bbox;
@@ -133,6 +135,15 @@ public:
 class triangle : public quad {
 public:
     triangle(const point3& Q, const vec3& u, const vec3& v, std::shared_ptr<material> mat) : quad(Q, u, v, std::move(mat)) {}
+
+    aabb bounding_box() const override {
+        point3 v0 = Q;
+        point3 v1 = Q + u;
+        point3 v2 = Q + v;
+        aabb box(v0, v1);
+        box = aabb(box, aabb(v2, v2));
+        return box;
+    }
 
     bool in_quad(double a, double b, hit_record& rec) const override {
         if (a < 0 || b < 0 || a + b > 1)
