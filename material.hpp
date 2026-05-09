@@ -73,7 +73,7 @@ class dielectric : public material {
 
         vec3 dir;
 
-        if (eta_ratio * sin > 1.0 || random_double() > reflectance(cos, eta_ratio)) {
+        if (eta_ratio * sin > 1.0 || random_double() < reflectance(cos, eta_ratio)) {
             // Can't refract
             dir = reflect(unit_in, rec.normal);
         }
