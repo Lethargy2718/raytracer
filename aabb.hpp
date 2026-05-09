@@ -47,10 +47,10 @@ public:
         // Ensure t0 < t1
         if (t0 > t1) std::swap(t0, t1);
 
-        double mn = std::max(t_interval.min, t0);
-        double mx = std::min(t_interval.max, t1);
+        t_interval.min = std::max(t_interval.min, t0);
+        t_interval.max = std::min(t_interval.max, t1);
 
-        if (mn > mx)
+        if (t_interval.min >= t_interval.max)
           return false;
       }
 
