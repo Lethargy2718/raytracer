@@ -58,7 +58,7 @@ class camera {
                 int done = rows_done.load();
                 double elapsed = stopwatch.elapsed();
                 std::clog << "\rRemaining: " << (image_height - done)
-                          << " scanlines | Elapsed: " << std::fixed << std::setprecision(1)
+                          << " scanlines | Elapsed: " << std::fixed << std::setprecision(0)
                           << elapsed << "s   " << std::flush;
                 if (done >= image_height) break;
                 std::this_thread::sleep_for(std::chrono::milliseconds(100));
@@ -77,7 +77,7 @@ class camera {
             }
         }
 
-        std::clog << "\rDone.                   \n"
+        std::clog << "\rDone.                                           \n"
                   << "Took " << stopwatch.elapsed() << " seconds.\n";
     }
 
