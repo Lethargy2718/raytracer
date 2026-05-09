@@ -16,10 +16,11 @@
 
 class camera {
   public:
-    double aspect_ratio = 1.0;  // Ratio of image width over height
-    int image_width  = 1000;  // Rendered image width in pixel count
-    int samples_per_pixel = 10;   // Count of random samples for each pixel
-    int max_depth = 50; // Maximum number of bounces
+    double aspect_ratio = 1.0;                  // Ratio of image width over height
+    int image_width  = 1000;                    // Rendered image width in pixel count
+    int samples_per_pixel = 10;                 // Count of random samples for each pixel
+    int max_depth = 50;                         // Maximum number of bounces
+    color background = color(0.70, 0.80, 1.00); // Scene background
 
     double vfov = 90;
     point3 look_from = point3(0,0,0);
@@ -178,18 +179,21 @@ class camera {
         if (depth <= 0) return {0,0,0};
         hit_record rec;
 
-        if (world.hit(r, interval(0.001, math::infinity), rec)) {
-            auto &mat = rec.mat;
-            color attenuation;
-            ray scattered;
-            if (mat->scatter(r, rec, attenuation, scattered)) {
-                return attenuation * ray_color(scattered, depth - 1, world);
-            }
-            return {0,0,0};
-        }
+        // Hit the sky
+        if (!world.hit(r, interval(0.001, math::infinity), rec))
+            return background;
 
-        const vec3 unit_direction = unit_vector(r.direction());
-        const auto a = 0.5*(unit_direction.y() + 1.0);
-        return (1.0-a)*color(1.0, 1.0, 1.0) + a*color(0.5, 0.7, 1.0);
+        auto &mat = rec.mat;
+        ray scattered;
+        color attenuation;
+        color emission_color = rec.mat->emitted(rec.u, rec.v, rec.p);
+
+        // Only return the natural emission of the mat and ignore the ray
+        if (!mat->scatter(r, rec, attenuation, scattered))
+            return emission_color;
+
+        color scatter_color = attenuation * ray_color(scattered, depth - 1, world);
+
+        return scatter_color + emission_color;
     }
 };

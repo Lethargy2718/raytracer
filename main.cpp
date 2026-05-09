@@ -218,7 +218,7 @@ void obj_scene() {
 
     camera cam;
     cam.aspect_ratio      = 16.0 / 9.0;
-    cam.image_width       = 1000;
+    cam.image_width       = 2560 / 2;
     cam.samples_per_pixel = 1;
     cam.max_depth         = 50;
 
@@ -231,8 +231,83 @@ void obj_scene() {
     cam.render(world);
 }
 
+void simple_light() {
+    hittable_list world;
+
+    auto pertext = make_shared<perlin_texture>(4);
+    world.add(make_shared<sphere>(point3(0,-1000,0), 1000, make_shared<lambertian>(pertext)));
+    world.add(make_shared<sphere>(point3(0,2,0), 2, make_shared<lambertian>(pertext)));
+
+    auto difflight1 = make_shared<diffuse_light>(color(0,0,1));
+    auto difflight2 = make_shared<diffuse_light>(color(1,0,0));
+    world.add(make_shared<sphere>(point3(0,7,0), 2, difflight1));
+    world.add(make_shared<quad>(point3(3,1,-2), vec3(2,0,0), vec3(0,2,0), difflight2));
+
+    camera cam;
+
+    cam.aspect_ratio      = 16.0 / 9.0;
+    cam.image_width       = 2560 / 2;
+    cam.samples_per_pixel = 100;
+    cam.max_depth         = 50;
+    cam.background        = color(0,0,0);
+
+    cam.vfov     = 20;
+    cam.look_from = point3(26,3,6);
+    cam.look_at   = point3(0,2,0);
+    cam.vup      = vec3(0,1,0);
+
+    cam.defocus_angle = 0;
+
+    cam.render(world);
+}
+
+void cornell_box() {
+    hittable_list world;
+
+    auto red   = make_shared<lambertian>(color(.65, .05, .05));
+    auto white = make_shared<lambertian>(color(.73, .73, .73));
+    auto green = make_shared<lambertian>(color(.12, .45, .15));
+    auto light = make_shared<diffuse_light>(color(15, 15, 15));
+
+    world.add(make_shared<quad>(point3(555,0,0), vec3(0,555,0), vec3(0,0,555), green));
+    world.add(make_shared<quad>(point3(0,0,0), vec3(0,555,0), vec3(0,0,555), red));
+    world.add(make_shared<quad>(point3(343, 554, 332), vec3(-130,0,0), vec3(0,0,-105), light));
+    world.add(make_shared<quad>(point3(0,0,0), vec3(555,0,0), vec3(0,0,555), white));
+    world.add(make_shared<quad>(point3(555,555,555), vec3(-555,0,0), vec3(0,0,-555), white));
+    world.add(make_shared<quad>(point3(0,0,555), vec3(555,0,0), vec3(0,555,0), white));
+
+    std::shared_ptr<hittable> box1 = box(point3(0,0,0), point3(165,330,165), white);
+    box1 = make_shared<rotate_y>(box1, 15);
+    box1 = make_shared<translate>(box1, vec3(265,0,295));
+    world.add(box1);
+
+    std::shared_ptr<hittable> box2 = box(point3(0,0,0), point3(165,165,165), white);
+    box2 = make_shared<rotate_y>(box2, -18);
+    box2 = make_shared<translate>(box2, vec3(130,0,65));
+    world.add(box2);
+
+    world = hittable_list(make_shared<bvh_node>(world));
+
+    camera cam;
+
+    cam.aspect_ratio      = 1.0;
+    cam.image_width       = 600;
+    cam.samples_per_pixel = 100;
+    cam.max_depth         = 5;
+    cam.background        = color(0,0,0);
+
+    cam.vfov        = 40;
+    cam.look_from   = point3(278, 278, -800);
+    cam.look_at     = point3(278, 278, 0);
+    cam.vup         = vec3(0,1,0);
+
+    cam.defocus_angle = 0;
+
+    cam.render(world);
+}
+
 int main() {
-    switch (6) {
+    switch (8) {
         case 1:
             default_scene();
             break;
@@ -251,7 +326,12 @@ int main() {
         case 6:
             obj_scene();
             break;
+        case 7:
+            simple_light();
+            break;
+        case 8:
+            cornell_box();
         default:
-            default_scene();
+            break;
     }
 }

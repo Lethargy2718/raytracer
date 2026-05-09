@@ -44,3 +44,11 @@ class interval {
 
 const interval interval::empty    = interval(+math::infinity, -math::infinity);
 const interval interval::universe = interval(-math::infinity, +math::infinity);
+
+inline interval operator+(const interval& i, double displacement) {
+    return interval(i.min + displacement, i.max + displacement);
+}
+
+inline interval operator+(double displacement, const interval& i) {
+    return i + displacement;
+}
