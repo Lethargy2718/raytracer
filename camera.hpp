@@ -1,6 +1,7 @@
 #pragma once
 
 #include <atomic>
+#include <iomanip>
 #include <iostream>
 #include <vector>
 #include <thread>
@@ -33,7 +34,7 @@ class camera {
     void render(const hittable& world) {
         initialize();
 
-        const timer timer;
+        timer stopwatch;
 
         std::vector<color> framebuffer(image_width * image_height);
         std::atomic<int> rows_done{0};
@@ -42,13 +43,11 @@ class camera {
         if (thread_count == 0) thread_count = 4;
 
         std::vector<std::thread> threads;
-
         int rows_per_thread = image_height / thread_count;
 
         for (int t = 0; t < thread_count; t++) {
             int start = t * rows_per_thread;
             int end = (t == thread_count - 1) ? image_height : start + rows_per_thread;
-
             threads.emplace_back([=, &world, &framebuffer, &rows_done]() {
                 render_rows(start, end, world, framebuffer, rows_done);
             });
@@ -57,7 +56,10 @@ class camera {
         std::thread progress([&]() {
             while (true) {
                 int done = rows_done.load();
-                std::clog << "\rScanlines remaining: " << (image_height - done) << "   " << std::flush;
+                double elapsed = stopwatch.elapsed();
+                std::clog << "\rRemaining: " << (image_height - done)
+                          << " scanlines | Elapsed: " << std::fixed << std::setprecision(1)
+                          << elapsed << "s   " << std::flush;
                 if (done >= image_height) break;
                 std::this_thread::sleep_for(std::chrono::milliseconds(100));
             }
@@ -69,16 +71,14 @@ class camera {
         progress.join();
 
         std::cout << "P3\n" << image_width << ' ' << image_height << "\n255\n";
-
         for (int j = 0; j < image_height; j++) {
             for (int i = 0; i < image_width; i++) {
                 write_color(std::cout, framebuffer[j * image_width + i]);
             }
         }
 
-        std::clog << "\rDone.                   \n" << "Took " << timer.elapsed() << " seconds.\n";
-        // std::clog << "Used " << thread_count << " threads.\n";
-        // std::clog << "Sampled " << samples_per_pixel << " times per pixel.\n";
+        std::clog << "\rDone.                   \n"
+                  << "Took " << stopwatch.elapsed() << " seconds.\n";
     }
 
   private:
