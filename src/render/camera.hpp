@@ -45,9 +45,9 @@ class camera {
         std::vector<std::thread> threads;
         int rows_per_thread = image_height / thread_count;
 
-        for (int t = 0; t < thread_count; t++) {
-            int start = t * rows_per_thread;
-            int end = (t == thread_count - 1) ? image_height : start + rows_per_thread;
+        for (unsigned int t = 0; t < thread_count; t++) {
+            unsigned int start = t * rows_per_thread;
+            unsigned int end = (t == thread_count - 1) ? image_height : start + rows_per_thread;
             threads.emplace_back([=, &world, &framebuffer, &rows_done]() {
                 render_rows(start, end, world, framebuffer, rows_done);
             });
