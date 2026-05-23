@@ -1,6 +1,8 @@
 #pragma once
 
 #include <cmath>
+#include <ostream>
+
 #include "random.hpp"
 
 class vec3 {
