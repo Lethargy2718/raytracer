@@ -39,5 +39,6 @@ Thumbs.db
 image.ppm
 
 .clang-format
+.clang-tidy
 
 .obj

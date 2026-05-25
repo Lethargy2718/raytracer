@@ -20,7 +20,13 @@ void cornell_box() {
     auto red   = make_shared<lambertian>(color(.65, .05, .05));
     auto white = make_shared<lambertian>(color(.73, .73, .73));
     auto green = make_shared<lambertian>(color(.12, .45, .15));
-    auto light = make_shared<diffuse_light>(color(15, 15, 15));
+
+    // Testing light sampling
+    // auto red   = make_shared<lambertian>(color(0,0,0));
+    // auto white = make_shared<lambertian>(color(0,0,0));
+    // auto green = make_shared<lambertian>(color(0,0,0));
+
+    auto light = make_shared<diffuse_light>(color(1,1,1));
 
     world.add(make_shared<quad>(point3(555,0,0), vec3(0,555,0), vec3(0,0,555), green));
     world.add(make_shared<quad>(point3(0,0,0), vec3(0,555,0), vec3(0,0,555), red));

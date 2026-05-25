@@ -42,7 +42,7 @@ public:
         if (thread_count == 0) thread_count = 4;
 
         std::vector<std::thread> threads;
-        int rows_per_thread = image_height / thread_count;
+        unsigned int rows_per_thread = image_height / thread_count;
 
         // Create computing threads
         for (size_t t = 0; t < thread_count; t++) {
