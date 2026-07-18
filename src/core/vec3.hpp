@@ -137,6 +137,18 @@ inline vec3 random_vector_on_hemisphere(const vec3& normal) {
     return -random_vec;
 }
 
+inline vec3 random_cosine_direction() {
+    auto r1 = random_double();
+    auto r2 = random_double();
+
+    auto phi = 2*math::pi*r1;
+    auto x = std::cos(phi) * std::sqrt(r2);
+    auto y = std::sin(phi) * std::sqrt(r2);
+    auto z = std::sqrt(1-r2);
+
+    return vec3(x, y, z);
+}
+
 inline vec3 reflect(const vec3& incident, const vec3& normal) {
     return incident - 2 * dot(incident, normal) * normal;
 }
