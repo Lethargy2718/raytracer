@@ -209,13 +209,18 @@ private:
         auto &mat = rec.mat;
         ray scattered;
         color attenuation;
+        double pdf_value;
         color emission_color = rec.mat->emitted(rec.u, rec.v, rec.p);
 
         // Only return the natural emission of the mat and ignore the ray
-        if (!mat->scatter(r, rec, attenuation, scattered))
+        if (!mat->scatter(r, rec, attenuation, scattered, pdf_value))
             return emission_color;
 
-        color scatter_color = attenuation * ray_color(scattered, depth - 1, world);
+        double scattering_pdf = rec.mat->scattering_pdf(r, rec, scattered);
+        pdf_value = scattering_pdf;
+
+        // Full form: (Albedo * pScatter * Color) / p
+        color scatter_color = (attenuation * scattering_pdf * ray_color(scattered, depth-1, world)) / pdf_value;
 
         return scatter_color + emission_color;
     }

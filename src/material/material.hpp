@@ -3,6 +3,7 @@
 #include "ray.hpp"
 #include "color.hpp"
 #include "texture.hpp"
+#include "onb.hpp"
 
 class hit_record;
 
@@ -14,8 +15,14 @@ class material {
         return color(0,0,0);
     }
 
-    virtual bool scatter(const ray& r_in, const hit_record& rec, color& attenuation, ray& scattered) const {
+    virtual bool scatter(
+        const ray& r_in, const hit_record& rec, color& attenuation, ray& scattered, double& pdf
+    ) const {
         return false;
+    }
+
+    virtual double scattering_pdf(const ray& r_in, const hit_record& rec, const ray& scattered) const {
+        return 0;
     }
 };
 
@@ -24,17 +31,26 @@ class lambertian : public material {
     lambertian(const color &albedo, const float scatter_probability = 1.0f) : lambertian(std::make_shared<solid_color>(albedo), scatter_probability) {}
     lambertian(std::shared_ptr<texture> tex, const float scatter_probability = 1.0f) : tex(std::move(tex)), scatter_probability(scatter_probability) {}
 
-    bool scatter(const ray& r_in, const hit_record& rec, color& attenuation, ray& scattered) const override {
-        if (random_double(0,1) < scatter_probability) {
-            vec3 scatter_dir = rec.normal + random_unit_vector();
-            if (scatter_dir.near_zero())
-                scatter_dir = rec.normal;
+    bool scatter(
+        const ray& r_in, const hit_record& rec, color& attenuation, ray& scattered, double& pdf
+    ) const override {
+        // TODO: include russian roulette
+        onb uvw(rec.normal);
+        auto scatter_direction = uvw.transform(random_cosine_direction());
 
-            scattered = ray(rec.p, scatter_dir, r_in.time());
-            attenuation = tex->value(rec.u, rec.v, rec.p) / scatter_probability; // expected/average value
-            return true;
-        }
-        return false;
+        scattered = ray(rec.p, unit_vector(scatter_direction), r_in.time());
+        attenuation = tex->value(rec.u, rec.v, rec.p);
+
+        auto cos_theta = dot(uvw.w(), scattered.direction());
+        pdf =  cos_theta / math::pi; // TODO: check later if it's always going to be immediately overridden in camera
+
+        return true;
+    }
+
+    double scattering_pdf(const ray& r_in, const hit_record& rec, const ray& scattered) const override {
+        // auto cos_theta = dot(rec.normal, unit_vector(scattered.direction()));
+        // return cos_theta < 0 ? 0 : cos_theta/math::pi;
+        return 1 / (2 * math::pi);
     }
 
   private:
@@ -46,7 +62,7 @@ class metal : public material {
   public:
     metal(const color& albedo, const double fuzz = 0) : albedo(albedo), fuzz(fuzz < 1 ? fuzz : 1)  {}
 
-    bool scatter(const ray& r_in, const hit_record& rec, color& attenuation, ray& scattered) const override {
+    bool scatter(const ray& r_in, const hit_record& rec, color& attenuation, ray& scattered, double& pdf) const override {
         attenuation = albedo;
         vec3 reflected = reflect(r_in.direction(), rec.normal);
         reflected = unit_vector(reflected) + (fuzz * random_unit_vector());
@@ -63,7 +79,7 @@ class dielectric : public material {
   public:
     dielectric(double refraction_index) : refraction_index(refraction_index) {}
 
-    bool scatter(const ray& r_in, const hit_record& rec, color& attenuation, ray& scattered) const override {
+    bool scatter(const ray& r_in, const hit_record& rec, color& attenuation, ray& scattered, double& pdf) const override {
         attenuation = color(1,1,1); // glass absorbs nothing, so everything is returned
         double eta_ratio = rec.front_face ? 1.0 / refraction_index : refraction_index;
         vec3 unit_in = unit_vector(r_in.direction());
@@ -115,11 +131,16 @@ public:
     explicit isotropic(const color& albedo) : tex(std::make_shared<solid_color>(albedo)) {}
     explicit isotropic(const std::shared_ptr<texture> &tex) : tex(tex) {}
 
-    bool scatter(const ray& r_in, const hit_record& rec, color& attenuation, ray& scattered)
+    bool scatter(const ray& r_in, const hit_record& rec, color& attenuation, ray& scattered, double& pdf)
     const override {
-        scattered = ray(rec.p, random_unit_vector(), r_in.time());
+        scattered = ray(rec.p, random_unit_vector(), r_in.time()); // full sphere
         attenuation = tex->value(rec.u, rec.v, rec.p);
+        pdf = 1 / (4 * math::pi); // samples from full sphere of area 4pi
         return true;
+    }
+
+    double scattering_pdf(const ray& r_in, const hit_record& rec, const ray& scattered) const override {
+        return 1 / (4 * math::pi);
     }
 
 private:

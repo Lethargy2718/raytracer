@@ -138,6 +138,8 @@ inline vec3 random_vector_on_hemisphere(const vec3& normal) {
 }
 
 inline vec3 random_cosine_direction() {
+    // Samples from the PDF p(omega) = f(theta) = cos(theta) / pi
+
     auto r1 = random_double();
     auto r2 = random_double();
 
