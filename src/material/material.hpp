@@ -1,5 +1,7 @@
 #pragma once
 
+#include <utility>
+
 #include "ray.hpp"
 #include "color.hpp"
 #include "texture.hpp"
@@ -11,7 +13,7 @@ class material {
   public:
     virtual ~material() = default;
 
-    virtual color emitted(double u, double v, const point3& p) const {
+    virtual color emitted(const ray& r_in, const hit_record& rec) const {
         return color(0,0,0);
     }
 
@@ -115,11 +117,14 @@ class dielectric : public material {
 
 class diffuse_light : public material {
 public:
-    diffuse_light(std::shared_ptr<texture> tex) : tex(tex) {}
+    diffuse_light(std::shared_ptr<texture> tex) : tex(std::move(tex)) {}
     diffuse_light(const color& emit) : tex(std::make_shared<solid_color>(emit)) {}
 
-    color emitted(double u, double v, const point3& p) const override {
-        return tex->value(u, v, p);
+    color emitted(const ray& r_in, const hit_record& rec)
+    const override {
+        if (!rec.front_face)
+            return color(0,0,0);
+        return tex->value(rec.u, rec.v, rec.p);
     }
 
 private:

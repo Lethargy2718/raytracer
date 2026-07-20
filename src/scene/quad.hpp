@@ -17,6 +17,8 @@ public:
         D = dot(normal, Q);
         w = n / dot(n, n);
 
+        area = n.length();
+
         quad::set_bounding_box();
     }
 
@@ -57,6 +59,24 @@ public:
         return true;
     }
 
+    double pdf_value(const point3& origin, const vec3& direction) const override {
+        hit_record rec;
+
+        // If light never even hits the light source, the probability (density) of reaching it is 0
+        if (!this->hit(ray(origin, direction), interval(0.001, math::infinity), rec))
+            return 0;
+
+        auto distance_squared = rec.t * rec.t * direction.length_squared();
+        auto cosine = std::fabs(dot(direction, rec.normal) / direction.length());
+
+        return distance_squared / (cosine * area);
+    }
+
+    vec3 random(const point3& origin) const override {
+        auto random_on_surface = Q + (random_double() * u) + (random_double() * v); // Q is the top left point
+        return random_on_surface - origin; // Q - P = PQ
+    }
+
 protected:
     point3 Q;
     vec3 u, v;
@@ -67,6 +87,7 @@ private:
     aabb bbox;
     vec3 normal;
     double D;
+    double area;
 
     virtual bool in_quad(double a, double b, hit_record& rec) const {
         interval unit_interval = interval(0, 1);

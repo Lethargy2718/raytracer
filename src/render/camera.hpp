@@ -15,6 +15,7 @@
 #include "material.hpp"
 #include "timer.hpp"
 #include "math_utils.hpp"
+#include "pdf.hpp"
 
 class camera {
 public:
@@ -22,7 +23,7 @@ public:
     int image_width         = 1000;                     // Rendered image width in pixel count
     int samples_per_pixel   = 10;                       // Count of random samples for each pixel
     int max_depth           = 50;                       // Maximum number of bounces
-    color background        = color(0.70, 0.80, 1.00);  // Scene background
+    color background        = color(0.70, 0.80, 1.00);  // Scene background color
     double vfov             = 90;                       // Vertical field of view angle in degrees
     point3 look_from        = point3(0,0,0);            // Camera position
     point3 look_at          = point3(0,0,-1);           // Target position
@@ -30,7 +31,7 @@ public:
     double defocus_angle = 0;                           // Variation angle of rays through each pixel
     double focus_dist = 10;                             // Distance from look_from to plane of perfect focus
 
-    void render(const hittable& world) {
+    void render(const hittable& world, const hittable& lights) {
         initialize();
 
         timer stopwatch;
@@ -48,8 +49,8 @@ public:
         for (size_t t = 0; t < thread_count; t++) {
             size_t start = t * rows_per_thread;
             size_t end = (t == thread_count - 1) ? image_height : start + rows_per_thread;
-            threads.emplace_back([=, &world, &framebuffer, &rows_done]() {
-                render_rows(start, end, world, framebuffer, rows_done);
+            threads.emplace_back([=, &world, &lights, &framebuffer, &rows_done]() {
+                render_rows(start, end, world, lights, framebuffer, rows_done);
             });
         }
 
@@ -134,23 +135,23 @@ private:
         defocus_disk_v = v * defocus_radius;
     }
 
-    void render_rows(size_t start_j, size_t end_j, const hittable& world, std::vector<color>& framebuffer, std::atomic<int>& rows_done) const {
+    void render_rows(size_t start_j, size_t end_j, const hittable& world, const hittable& lights, std::vector<color>& framebuffer, std::atomic<int>& rows_done) const {
         for (size_t j = start_j; j < end_j; j++) {
             for (int i = 0; i < image_width; i++) {
-                color pixel_color = sample_pixel(i, j, world);
+                color pixel_color = sample_pixel(i, j, world, lights);
                 framebuffer[j * image_width + i] = pixel_color * pixel_samples_scale;
             }
             ++rows_done;
         }
     }
 
-    color sample_pixel(size_t i, size_t j, const hittable& world) const {
+    color sample_pixel(size_t i, size_t j, const hittable& world, const hittable& lights) const {
         // Sample a pixel using Stratified Monte Carlo
         color pixel_color(0,0,0);
         for (int s_j = 0; s_j < sqrt_spp; s_j++) {
             for (int s_i = 0; s_i < sqrt_spp; s_i++) {
                 ray r = get_ray(i, j, s_i, s_j);
-                pixel_color += ray_color(r, max_depth, world);
+                pixel_color += ray_color(r, max_depth, world, lights);
             }
         }
         return pixel_color;
@@ -198,7 +199,7 @@ private:
         return center + (p[0] * defocus_disk_u) + (p[1] * defocus_disk_v);
     }
 
-    color ray_color(const ray& r, const int depth, const hittable& world) const {
+    color ray_color(const ray& r, const int depth, const hittable& world, const hittable& lights) const {
         if (depth <= 0) return {0,0,0};
         hit_record rec;
 
@@ -210,17 +211,25 @@ private:
         ray scattered;
         color attenuation;
         double pdf_value;
-        color emission_color = rec.mat->emitted(rec.u, rec.v, rec.p);
+        color emission_color = rec.mat->emitted(r, rec);
 
         // Only return the natural emission of the mat and ignore the ray
         if (!mat->scatter(r, rec, attenuation, scattered, pdf_value))
             return emission_color;
 
+        auto p0 = std::make_shared<hittable_pdf>(lights, rec.p); // Steers towards light
+        auto p1 = std::make_shared<cosine_pdf>(rec.normal); // Cosine-weighted
+        mixture_pdf mixed_pdf(p0, p1); // Mixed sampling PDF
+
+        scattered = ray(rec.p, mixed_pdf.generate(), r.time());
+        pdf_value = mixed_pdf.value(scattered.direction());
+
+        // Scattering (cosine weighted)
         double scattering_pdf = rec.mat->scattering_pdf(r, rec, scattered);
-        pdf_value = scattering_pdf;
 
         // Full form: (Albedo * pScatter * Color) / p
-        color scatter_color = (attenuation * scattering_pdf * ray_color(scattered, depth-1, world)) / pdf_value;
+        color sample_color = ray_color(scattered, depth-1, world, lights);
+        color scatter_color = (attenuation * scattering_pdf * sample_color) / pdf_value;
 
         return scatter_color + emission_color;
     }

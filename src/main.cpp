@@ -44,6 +44,10 @@ void cornell_box() {
     box2 = make_shared<translate>(box2, vec3(130,0,65));
     world.add(box2);
 
+    // Light Sources
+    auto empty_material = std::shared_ptr<material>();
+    quad lights(point3(343,554,332), vec3(-130,0,0), vec3(0,0,-105), empty_material);
+
     camera cam;
 
     cam.aspect_ratio      = 1.0;
@@ -59,7 +63,7 @@ void cornell_box() {
 
     cam.defocus_angle = 0;
 
-    cam.render(world);
+    cam.render(world, lights);
 }
 
 int main() {
