@@ -5,9 +5,17 @@
 #include "ray.hpp"
 #include "color.hpp"
 #include "texture.hpp"
-#include "onb.hpp"
+#include "pdf.hpp"
 
 class hit_record;
+
+class scatter_record {
+public:
+    color attenuation;
+    std::shared_ptr<pdf> pdf_ptr;
+    bool skip_pdf;
+    ray skip_pdf_ray;
+};
 
 class material {
   public:
@@ -17,9 +25,7 @@ class material {
         return color(0,0,0);
     }
 
-    virtual bool scatter(
-        const ray& r_in, const hit_record& rec, color& attenuation, ray& scattered, double& pdf
-    ) const {
+    virtual bool scatter(const ray& r_in, const hit_record& rec, scatter_record& srec) const {
         return false;
     }
 
@@ -34,25 +40,18 @@ class lambertian : public material {
     lambertian(std::shared_ptr<texture> tex, const float scatter_probability = 1.0f) : tex(std::move(tex)), scatter_probability(scatter_probability) {}
 
     bool scatter(
-        const ray& r_in, const hit_record& rec, color& attenuation, ray& scattered, double& pdf
-    ) const override {
+        const ray& r_in, const hit_record& rec, scatter_record& srec)
+    const override {
         // TODO: include russian roulette
-        onb uvw(rec.normal);
-        auto scatter_direction = uvw.transform(random_cosine_direction());
-
-        scattered = ray(rec.p, unit_vector(scatter_direction), r_in.time());
-        attenuation = tex->value(rec.u, rec.v, rec.p);
-
-        auto cos_theta = dot(uvw.w(), scattered.direction());
-        pdf =  cos_theta / math::pi; // TODO: check later if it's always going to be immediately overridden in camera
-
+        srec.attenuation = tex->value(rec.u, rec.v, rec.p);
+        srec.pdf_ptr = std::make_shared<cosine_pdf>(rec.normal);
+        srec.skip_pdf = false;
         return true;
     }
 
     double scattering_pdf(const ray& r_in, const hit_record& rec, const ray& scattered) const override {
-        // auto cos_theta = dot(rec.normal, unit_vector(scattered.direction()));
-        // return cos_theta < 0 ? 0 : cos_theta/math::pi;
-        return 1 / (2 * math::pi);
+        auto cos_theta = dot(rec.normal, unit_vector(scattered.direction()));
+        return cos_theta < 0 ? 0 : cos_theta/math::pi;
     }
 
   private:
@@ -64,11 +63,17 @@ class metal : public material {
   public:
     metal(const color& albedo, const double fuzz = 0) : albedo(albedo), fuzz(fuzz < 1 ? fuzz : 1)  {}
 
-    bool scatter(const ray& r_in, const hit_record& rec, color& attenuation, ray& scattered, double& pdf) const override {
-        attenuation = albedo;
+    bool scatter(const ray& r_in, const hit_record& rec, scatter_record& srec) const override {
         vec3 reflected = reflect(r_in.direction(), rec.normal);
         reflected = unit_vector(reflected) + (fuzz * random_unit_vector());
-        scattered = ray(rec.p, reflected, r_in.time());
+
+        srec.attenuation = albedo;
+        srec.pdf_ptr = nullptr;
+        srec.skip_pdf = true;
+        srec.skip_pdf_ray = ray(rec.p, reflected, r_in.time());
+
+        // TODO: check why the book just returns true instead of checking if fuzz
+        // reflected into an invalid direction
         return dot(reflected, rec.normal) > 0.0;
     }
 
@@ -81,8 +86,7 @@ class dielectric : public material {
   public:
     dielectric(double refraction_index) : refraction_index(refraction_index) {}
 
-    bool scatter(const ray& r_in, const hit_record& rec, color& attenuation, ray& scattered, double& pdf) const override {
-        attenuation = color(1,1,1); // glass absorbs nothing, so everything is returned
+    bool scatter(const ray& r_in, const hit_record& rec, scatter_record& srec) const override {
         double eta_ratio = rec.front_face ? 1.0 / refraction_index : refraction_index;
         vec3 unit_in = unit_vector(r_in.direction());
 
@@ -99,7 +103,11 @@ class dielectric : public material {
             dir = refract(unit_in, rec.normal, eta_ratio);
         }
 
-        scattered = ray(rec.p, dir, r_in.time());
+        srec.attenuation = color(1,1,1); // glass absorbs nothing, so everything is returned
+        srec.pdf_ptr = nullptr;
+        srec.skip_pdf = true;
+        srec.skip_pdf_ray = ray(rec.p, dir, r_in.time());
+
         return true;
     }
 
@@ -136,11 +144,12 @@ public:
     explicit isotropic(const color& albedo) : tex(std::make_shared<solid_color>(albedo)) {}
     explicit isotropic(const std::shared_ptr<texture> &tex) : tex(tex) {}
 
-    bool scatter(const ray& r_in, const hit_record& rec, color& attenuation, ray& scattered, double& pdf)
-    const override {
-        scattered = ray(rec.p, random_unit_vector(), r_in.time()); // full sphere
-        attenuation = tex->value(rec.u, rec.v, rec.p);
-        pdf = 1 / (4 * math::pi); // samples from full sphere of area 4pi
+    bool scatter(
+        const ray& r_in, const hit_record& rec, scatter_record& srec
+    ) const override {
+        srec.attenuation = tex->value(rec.u, rec.v, rec.p);
+        srec.pdf_ptr = std::make_shared<sphere_pdf>();
+        srec.skip_pdf = false;
         return true;
     }
 
